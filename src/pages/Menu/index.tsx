@@ -81,18 +81,19 @@ const HomePage = () => {
         await apiService
             .GetMenu({ menu_id: menu_id })
             .then((res: any) => {
-                console.log(res.menu);
-                setData(res.menu);
-                setLoadingState(true);
+                if (res.success) {
+                    setData(res.data);
 
-                if (item_id) {
-                    const itemData = res.menu.menu_items.find((i: any) => i.ID === item_id);
+                    if (item_id) {
+                        const itemData = res.data.menu_items.find((i: any) => i.ID === item_id);
 
-                    formik.setFieldValue('name', itemData.name);
-                    formik.setFieldValue('description', itemData.description);
-                    formik.setFieldValue('price', itemData.price);
-                    formik.setFieldValue('imageurl', itemData.image_url);
+                        formik.setFieldValue('name', itemData.name);
+                        formik.setFieldValue('description', itemData.description);
+                        formik.setFieldValue('price', itemData.price);
+                        formik.setFieldValue('imageurl', itemData.image_url);
+                    }
                 }
+                setLoadingState(true);
             })
             .catch(() => {
                 setLoadingState(true);
