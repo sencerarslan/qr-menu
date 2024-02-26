@@ -147,8 +147,8 @@ const HomePage = () => {
                                                 <Box display="flex" flexDirection="row" alignItems="center" gap="15px">
                                                     <CardMedia
                                                         component="img"
-                                                        sx={{ width: 50 }}
-                                                        image={`https://api.qrserver.com/v1/create-qr-code/?size=50x50&data=https://qr-menu-wheat.vercel.app/menu/${item.menu_id}`}
+                                                        sx={{ width: 150 }}
+                                                        image={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://qr-menu-wheat.vercel.app/menu/${item.menu_id}`}
                                                         alt={item.name}
                                                     />
                                                     <div> {item.name}</div>

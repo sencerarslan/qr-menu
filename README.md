@@ -1,5 +1,5 @@
 # qr-menu
-  
+
 ## Installation
 
 To run this project locally, follow these steps:
@@ -11,6 +11,14 @@ To run this project locally, follow these steps:
 
 The application will be accessible at `http://localhost:3000` in your web browser.
 
+## Demo
+
+You can try out a demo of this project at: [https://qr-menu-wheat.vercel.app/](https://qr-menu-wheat.vercel.app/)
+
+## Backend Project
+
+The backend for this project can be found at: [https://github.com/sencerarslan/go-app](https://github.com/sencerarslan/go-app)
+
 ## Technologies Used
 
 - ReactJS
@@ -21,4 +29,3 @@ The application will be accessible at `http://localhost:3000` in your web browse
 - Eslint
 - Axios
 - Moment
- 
