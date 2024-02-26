@@ -43,7 +43,7 @@ const Login: React.FC = () => {
                 })
                 .then((res: any) => {
                     console.log(res);
-                    handleLogin(dispatch, res);
+                    handleLogin(dispatch, res.data);
                     setTimeout(() => {
                         navigate(routesPaths.base);
                     });
