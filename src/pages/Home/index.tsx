@@ -136,7 +136,7 @@ const HomePage = () => {
                             justifyContent="center"
                             gap="15px"
                         >
-                            <Table sx={{ maxWidth: 350 }} size="small">
+                            <Table sx={{ maxWidth: 550 }} size="small">
                                 <TableBody>
                                     {data.map((item: any) => (
                                         <TableRow
@@ -147,8 +147,8 @@ const HomePage = () => {
                                                 <Box display="flex" flexDirection="row" alignItems="center" gap="15px">
                                                     <CardMedia
                                                         component="img"
-                                                        sx={{ width: 150 }}
-                                                        image={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://qr-menu-wheat.vercel.app/menu/${item.menu_id}`}
+                                                        sx={{ width: 100 }}
+                                                        image={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://qr-menu-wheat.vercel.app/menu/${item.menu_id}`}
                                                         alt={item.name}
                                                     />
                                                     <div> {item.name}</div>
