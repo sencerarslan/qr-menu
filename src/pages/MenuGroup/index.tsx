@@ -5,7 +5,6 @@ import { Loading } from 'components/loading';
 import {
     Box,
     Button,
-    CardMedia,
     IconButton,
     Table,
     TableBody,
@@ -15,18 +14,19 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
-import { Cancel, Edit, MenuBook } from '@mui/icons-material';
+import { ArrowBack, Cancel, Edit, MenuBook } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { routesPaths } from 'config/routes';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export interface HomePageProps {}
 
-const HomePage = () => {
+const GroupMenu = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [loadingState, setLoadingState] = useState<boolean>(true);
-    const [data, setData] = useState<any>();
+    const [data, setData] = useState<[]>([]);
 
     const validation = yup.object().shape({
         name: yup.string().required(),
@@ -35,21 +35,18 @@ const HomePage = () => {
         initialValues: {
             id: '',
             name: '',
-            logo: '',
-            banner: '',
         },
         onSubmit: async () => {
             handleSubmit(formik.values);
         },
         validationSchema: validation,
     });
+
     const isFormValid = formik.isValid;
 
     const setFormikFunc = (data: any) => {
-        formik.setFieldValue('id', data.id);
+        formik.setFieldValue('id', data.ID);
         formik.setFieldValue('name', data.name);
-        formik.setFieldValue('logo', data.logo);
-        formik.setFieldValue('banner', data.banner);
     };
 
     const handleClick = (event: any) => {
@@ -60,11 +57,10 @@ const HomePage = () => {
     const handleSubmit = async (data: any) => {
         try {
             await apiService
-                .MenuAdd({
+                .GroupMenuAdd({
                     ID: data.id,
+                    menu_id: id,
                     name: data.name,
-                    logo: data.logo,
-                    banner: data.banner,
                 })
                 .then((res: any) => {
                     if (res.success) {
@@ -83,7 +79,7 @@ const HomePage = () => {
     const handleData = useCallback(async () => {
         setLoadingState(false);
         await apiService
-            .AllMenu()
+            .AllGroupMenu({ ID: id })
             .then((res: any) => {
                 if (res.success) {
                     setData(res.data);
@@ -98,7 +94,7 @@ const HomePage = () => {
     const handleDelete = useCallback(async (id: any) => {
         if (confirm('Are you sure you want to delete?')) {
             try {
-                const res = await apiService.MenuDelete({ ID: id });
+                const res = await apiService.GroupMenuDelete({ ID: id });
                 if (res.success) {
                     formik.resetForm();
                     handleData();
@@ -111,7 +107,7 @@ const HomePage = () => {
 
     useEffect(() => {
         handleData();
-    }, []);
+    }, [id]);
 
     return (
         <Styled>
@@ -120,10 +116,10 @@ const HomePage = () => {
                     sx={{ minHeight: 'calc(100vh - 107px)' }}
                     display="flex"
                     flexDirection="row"
-                    flexWrap="wrap"
                     alignItems="center"
                     justifyContent="center"
                     gap="115px"
+                    flexWrap="wrap"
                 >
                     <Box
                         width={300}
@@ -134,16 +130,25 @@ const HomePage = () => {
                         gap="15px"
                     >
                         <div className="container">
-                            <Typography component="h1" variant="h5">
-                                {!formik.values.id ? 'New Menu' : 'Edit Menu'}
-                            </Typography>
+                            <Box display="flex" alignItems="center">
+                                <Tooltip
+                                    children={
+                                        <IconButton onClick={() => history.back()}>
+                                            <ArrowBack />
+                                        </IconButton>
+                                    }
+                                    title={'Back'}
+                                />
+                                <Typography component="h1" variant="h5">
+                                    {!formik.values.id ? 'New Group' : 'Edit Group'}
+                                </Typography>
+                            </Box>
                             <form className="form" onSubmit={handleClick}>
                                 <TextField
                                     id="name"
                                     name="name"
                                     margin="normal"
                                     autoComplete="name"
-                                    autoFocus
                                     fullWidth
                                     color="secondary"
                                     label={'Name'}
@@ -153,36 +158,6 @@ const HomePage = () => {
                                         formik.setFieldValue('name', e.target.value);
                                     }}
                                     error={formik.touched.name && Boolean(formik.errors.name)}
-                                />
-                                <TextField
-                                    id="logo"
-                                    name="logo"
-                                    margin="normal"
-                                    autoComplete="logo"
-                                    fullWidth
-                                    color="secondary"
-                                    value={formik.values.logo}
-                                    label={'Logo Url'}
-                                    variant="outlined"
-                                    onChange={(e: any) => {
-                                        formik.setFieldValue('logo', e.target.value);
-                                    }}
-                                    error={formik.touched.logo && Boolean(formik.errors.logo)}
-                                />
-                                <TextField
-                                    id="banner"
-                                    name="banner"
-                                    margin="normal"
-                                    autoComplete="banner"
-                                    fullWidth
-                                    color="secondary"
-                                    value={formik.values.banner}
-                                    label={'Banner Url'}
-                                    variant="outlined"
-                                    onChange={(e: any) => {
-                                        formik.setFieldValue('banner', e.target.value);
-                                    }}
-                                    error={formik.touched.banner && Boolean(formik.errors.banner)}
                                 />
                                 <Button
                                     sx={{ mt: 1 }}
@@ -212,7 +187,7 @@ const HomePage = () => {
                             </form>
                         </div>
                     </Box>
-                    {data ? (
+                    {data.length > 0 ? (
                         <Box
                             display="flex"
                             flexDirection="column"
@@ -228,21 +203,18 @@ const HomePage = () => {
                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                         >
                                             <TableCell
-                                                onClick={() => navigate(`${routesPaths.group}/${item.id}`)}
+                                                onClick={() => navigate(`${routesPaths.groupMenu}/${item.ID}`)}
                                                 component="th"
                                                 sx={{ cursor: 'pointer' }}
                                                 scope="row"
                                             >
                                                 <Box display="flex" flexDirection="row" alignItems="center" gap="15px">
-                                                    <CardMedia
-                                                        component="img"
-                                                        sx={{ width: 100 }}
-                                                        image={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://qr-menu-wheat.vercel.app/qr/${item.menu_id}`}
-                                                        alt={item.name}
-                                                    />
-                                                    <div> {item.name}</div>
+                                                    <Box display="flex" flexDirection="column">
+                                                        <b>{item.name}</b>
+                                                    </Box>
                                                 </Box>
                                             </TableCell>
+
                                             <TableCell align="right">
                                                 <Tooltip
                                                     children={
@@ -260,7 +232,7 @@ const HomePage = () => {
                                                     children={
                                                         <IconButton
                                                             onClick={() => {
-                                                                handleDelete(item.id);
+                                                                handleDelete(item.ID);
                                                             }}
                                                             color="secondary"
                                                         >
@@ -291,4 +263,4 @@ const HomePage = () => {
         </Styled>
     );
 };
-export default HomePage;
+export default GroupMenu;

@@ -8,6 +8,7 @@ import { handleLogin } from 'common/auth/Authentication';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { routesPaths } from 'config/routes';
+import Logo from 'components/logo';
 
 const Login: React.FC = () => {
     const dispatch = useDispatch();
@@ -60,7 +61,9 @@ const Login: React.FC = () => {
         <Styled>
             <Container component="main" maxWidth="xs">
                 <div className="container">
-                    <Typography component="h1" variant="h5">
+                    <Logo />
+
+                    <Typography mt={2} component="h1" variant="h5">
                         Login
                     </Typography>
                     <form className="form" onSubmit={handleClick}>

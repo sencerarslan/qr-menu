@@ -5,8 +5,9 @@ import AuthLayout from 'components/layouts/auth-layout';
 import AuthGuard from 'common/auth/AuthGuard';
 export const routesPaths = {
     base: '/',
-    menu: '/menu',
-    menuControl: '/menu/control',
+    qr: '/qr',
+    group: '/group',
+    groupMenu: '/group/menu',
     login: '/login',
     register: '/register',
 };
@@ -22,7 +23,16 @@ export const appRoutes: AppRoute[] = [
     },
     {
         exact: true,
-        path: routesPaths.menuControl + '/:menu_id',
+        path: routesPaths.group + '/:id',
+        guard: AuthGuard,
+        guardCondition: true,
+        redirect: routesPaths.login,
+        layout: BaseLayout,
+        component: lazy(() => import('../pages/MenuGroup')),
+    },
+    {
+        exact: true,
+        path: routesPaths.groupMenu + '/:id',
         guard: AuthGuard,
         guardCondition: true,
         redirect: routesPaths.login,
@@ -31,16 +41,7 @@ export const appRoutes: AppRoute[] = [
     },
     {
         exact: true,
-        path: routesPaths.menuControl + '/:menu_id/:item_id',
-        guard: AuthGuard,
-        guardCondition: true,
-        redirect: routesPaths.login,
-        layout: BaseLayout,
-        component: lazy(() => import('../pages/Menu')),
-    },
-    {
-        exact: true,
-        path: routesPaths.menu + '/:menu_id',
+        path: routesPaths.qr + '/:id',
         layout: AuthLayout,
         component: lazy(() => import('../pages/ShowMenu')),
     },

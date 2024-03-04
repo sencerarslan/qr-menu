@@ -12,20 +12,20 @@ import {
     TableCell,
     TableRow,
     TextField,
+    Tooltip,
     Typography,
 } from '@mui/material';
-import { Delete, Edit, MenuBook } from '@mui/icons-material';
+import { ArrowBack, Cancel, Edit, MenuBook } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { routesPaths } from 'config/routes';
 import { useParams } from 'react-router-dom';
 
 export interface HomePageProps {}
 
-const HomePage = () => {
-    const { menu_id, item_id } = useParams();
+const MenuItem = () => {
+    const { id } = useParams();
     const [loadingState, setLoadingState] = useState<boolean>(true);
-    const [data, setData] = useState<any>();
+    const [data, setData] = useState<[]>([]);
 
     const validation = yup.object().shape({
         name: yup.string().required(),
@@ -45,7 +45,16 @@ const HomePage = () => {
         },
         validationSchema: validation,
     });
+
     const isFormValid = formik.isValid;
+
+    const setFormikFunc = (data: any) => {
+        formik.setFieldValue('id', data.ID);
+        formik.setFieldValue('name', data.name);
+        formik.setFieldValue('description', data.description);
+        formik.setFieldValue('price', data.price);
+        formik.setFieldValue('imageurl', data.image_url);
+    };
 
     const handleClick = (event: any) => {
         event.preventDefault();
@@ -54,19 +63,21 @@ const HomePage = () => {
 
     const handleSubmit = async (data: any) => {
         try {
+            console.log(data);
             await apiService
                 .MenuItemAdd({
-                    ID: item_id,
-                    menu_id: menu_id,
+                    group_id: id,
+                    ID: data.id,
                     name: data.name,
                     description: data.description,
-                    price: Number(data.price),
                     image_url: data.imageurl,
+                    price: Number(data.price),
                 })
                 .then((res: any) => {
-                    console.log(res);
-                    handleData();
-                    formik.resetForm();
+                    if (res.success) {
+                        handleData();
+                        formik.resetForm();
+                    }
                 })
                 .catch((err: any) => {
                     console.log('err:', err);
@@ -79,19 +90,10 @@ const HomePage = () => {
     const handleData = useCallback(async () => {
         setLoadingState(false);
         await apiService
-            .GetMenu({ menu_id: menu_id })
+            .AllGroupItemMenu({ ID: id })
             .then((res: any) => {
                 if (res.success) {
                     setData(res.data);
-
-                    if (item_id) {
-                        const itemData = res.data.menu_items.find((i: any) => i.ID === item_id);
-
-                        formik.setFieldValue('name', itemData.name);
-                        formik.setFieldValue('description', itemData.description);
-                        formik.setFieldValue('price', itemData.price);
-                        formik.setFieldValue('imageurl', itemData.image_url);
-                    }
                 }
                 setLoadingState(true);
             })
@@ -101,16 +103,22 @@ const HomePage = () => {
     }, []);
 
     const handleDelete = useCallback(async (id: any) => {
-        await apiService.MenuItemDelete({ ID: id }).then(() => {
-            if (item_id) {
-                window.location.href = `${routesPaths.menuControl}/${menu_id}`;
+        if (confirm('Are you sure you want to delete?')) {
+            try {
+                const res = await apiService.MenuItemDelete({ ID: id });
+                if (res.success) {
+                    formik.resetForm();
+                    handleData();
+                }
+            } catch (error) {
+                console.error(error);
             }
-        });
+        }
     }, []);
 
     useEffect(() => {
         handleData();
-    }, [item_id]);
+    }, [id]);
 
     return (
         <Styled>
@@ -122,6 +130,7 @@ const HomePage = () => {
                     alignItems="center"
                     justifyContent="center"
                     gap="115px"
+                    flexWrap="wrap"
                 >
                     <Box
                         width={300}
@@ -132,10 +141,20 @@ const HomePage = () => {
                         gap="15px"
                     >
                         <div className="container">
-                            <Typography component="h1" variant="h5">
-                                {data?.name}
-                            </Typography>
-                            <form className="form" key={menu_id + '-' + item_id} onSubmit={handleClick}>
+                            <Box display="flex" alignItems="center">
+                                <Tooltip
+                                    children={
+                                        <IconButton onClick={() => history.back()}>
+                                            <ArrowBack />
+                                        </IconButton>
+                                    }
+                                    title={'Back'}
+                                />
+                                <Typography component="h1" variant="h5">
+                                    {!formik.values.id ? 'New Item' : 'Edit Item'}
+                                </Typography>
+                            </Box>
+                            <form className="form" onSubmit={handleClick}>
                                 <TextField
                                     id="name"
                                     name="name"
@@ -206,7 +225,7 @@ const HomePage = () => {
                                     size="large"
                                     disabled={!isFormValid}
                                 >
-                                    Save
+                                    {!formik.values.id ? 'Save' : 'Update'}
                                 </Button>
                                 <Button
                                     sx={{ mt: 1 }}
@@ -215,14 +234,17 @@ const HomePage = () => {
                                     variant="contained"
                                     color="primary"
                                     size="large"
-                                    href={`${routesPaths.menuControl}/${menu_id}`}
+                                    disabled={!formik.values.id}
+                                    onClick={() => {
+                                        formik.resetForm();
+                                    }}
                                 >
                                     Clear
                                 </Button>
                             </form>
                         </div>
                     </Box>
-                    {data ? (
+                    {data.length > 0 ? (
                         <Box
                             display="flex"
                             flexDirection="column"
@@ -232,7 +254,7 @@ const HomePage = () => {
                         >
                             <Table sx={{ maxWidth: 550 }} size="small">
                                 <TableBody>
-                                    {data.menu_items?.map((item: any) => (
+                                    {data.map((item: any) => (
                                         <TableRow
                                             key={item.name}
                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -251,23 +273,35 @@ const HomePage = () => {
                                                     </Box>
                                                 </Box>
                                             </TableCell>
-                                            <TableCell align="right">${item.price}</TableCell>
                                             <TableCell align="right">
-                                                <Box display="flex" flexDirection="row" alignItems="center" gap="15px">
-                                                    <IconButton
-                                                        href={`${routesPaths.menuControl}/${item.menu_id}/${item.ID}`}
-                                                        size="large"
-                                                    >
-                                                        <Edit />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        onClick={() => handleDelete(item.ID)}
-                                                        color="error"
-                                                        size="large"
-                                                    >
-                                                        <Delete />
-                                                    </IconButton>
-                                                </Box>
+                                                <div>{item.price} TL</div>
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Tooltip
+                                                    children={
+                                                        <IconButton
+                                                            onClick={() => {
+                                                                setFormikFunc(item);
+                                                            }}
+                                                        >
+                                                            <Edit />
+                                                        </IconButton>
+                                                    }
+                                                    title={'Edit'}
+                                                />
+                                                <Tooltip
+                                                    children={
+                                                        <IconButton
+                                                            onClick={() => {
+                                                                handleDelete(item.ID);
+                                                            }}
+                                                            color="secondary"
+                                                        >
+                                                            <Cancel />
+                                                        </IconButton>
+                                                    }
+                                                    title={'Delete'}
+                                                />
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -290,4 +324,4 @@ const HomePage = () => {
         </Styled>
     );
 };
-export default HomePage;
+export default MenuItem;

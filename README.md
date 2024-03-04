@@ -15,6 +15,8 @@ The application will be accessible at `http://localhost:3000` in your web browse
 
 You can try out a demo of this project at: [https://qr-menu-wheat.vercel.app/](https://qr-menu-wheat.vercel.app/)
 
+Demo Menu: [https://qr-menu-wheat.vercel.app/qr/65e5b0f2ae2dd5c28db6c381](https://qr-menu-wheat.vercel.app/qr/65e5b0f2ae2dd5c28db6c381)
+
 ## Backend Project
 
 The backend for this project can be found at: [https://github.com/sencerarslan/go-app](https://github.com/sencerarslan/go-app)

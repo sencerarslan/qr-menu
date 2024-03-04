@@ -6,6 +6,7 @@ import { userLogout } from 'store/reducers/userReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { routesPaths } from 'config/routes';
 import { Link } from 'react-router-dom';
+import Logo from 'components/logo';
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -53,12 +54,7 @@ const Header = () => {
     }));
     return (
         <Styled>
-            <div className="logo">
-                ADMIN
-                <small>
-                    <QrCodeScanner /> QR MENU
-                </small>
-            </div>
+            <Logo />
 
             <IconButton onClick={handleClick}>
                 <StyledBadge

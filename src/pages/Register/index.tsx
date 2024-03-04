@@ -6,6 +6,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { routesPaths } from 'config/routes';
 import { DoneAll } from '@mui/icons-material';
+import Logo from 'components/logo';
 
 const Register: React.FC = () => {
     const [state, setState] = useState<boolean>(false);
@@ -67,7 +68,9 @@ const Register: React.FC = () => {
             <Container component="main" maxWidth="xs">
                 {!state ? (
                     <div className="container">
-                        <Typography component="h1" variant="h5">
+                        <Logo />
+
+                        <Typography mt={2} component="h1" variant="h5">
                             Register
                         </Typography>
                         <form className="form" onSubmit={handleClick}>
