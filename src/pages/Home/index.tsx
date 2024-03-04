@@ -237,7 +237,7 @@ const HomePage = () => {
                                                     <CardMedia
                                                         component="img"
                                                         sx={{ width: 100 }}
-                                                        image={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://qr-menu-wheat.vercel.app/qr/${item.menu_id}`}
+                                                        image={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://qr-menu-wheat.vercel.app/qr/${item.id}`}
                                                         alt={item.name}
                                                     />
                                                     <div> {item.name}</div>
